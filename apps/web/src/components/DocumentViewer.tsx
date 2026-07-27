@@ -2,10 +2,19 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, ZoomIn, Info, X, ChevronRight, Languages } from 'lucide-react';
+import { FileText, ZoomIn, X, ChevronRight, Languages, Quote, Check } from 'lucide-react';
 
 export default function DocumentViewer() {
   const [isOpen, setIsOpen] = useState(true);
+  const [copiedQuote, setCopiedQuote] = useState(false);
+
+  const generateCitation = () => {
+    // Simulador de gerador dinâmico de ABNT
+    const citation = "ARQUIVO NACIONAL. Carta de Alforria de João. Códice 123. Rio de Janeiro, 1792. Disponível no Atlas Histórico Digital do Atlântico e das Diásporas.";
+    navigator.clipboard.writeText(citation);
+    setCopiedQuote(true);
+    setTimeout(() => setCopiedQuote(false), 2000);
+  };
 
   return (
     <>
@@ -74,7 +83,19 @@ export default function DocumentViewer() {
                   <p><span className="font-bold text-zinc-400">Fundo:</span> Arquivo Nacional</p>
                   <p><span className="font-bold text-zinc-400">Coleção:</span> Códice 123</p>
                   <p><span className="font-bold text-zinc-400">Idioma:</span> Português Arcaico</p>
-                  <p className="pt-2 border-t border-white/5 leading-relaxed">
+                  
+                  {/* Botão Geração Automática de Citação */}
+                  <div className="pt-2">
+                    <button 
+                      onClick={generateCitation}
+                      className="flex items-center gap-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-md text-white transition-colors w-full justify-center"
+                    >
+                      {copiedQuote ? <Check className="w-3 h-3 text-green-400" /> : <Quote className="w-3 h-3" />}
+                      {copiedQuote ? 'Citação Copiada (ABNT)' : 'Gerar Citação (ABNT/APA)'}
+                    </button>
+                  </div>
+
+                  <p className="pt-2 border-t border-white/5 leading-relaxed text-zinc-400 italic">
                     &quot;Declaro que concedo a liberdade a meu escravo João, por bons serviços prestados...&quot;
                   </p>
                 </div>

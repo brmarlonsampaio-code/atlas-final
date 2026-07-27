@@ -4,6 +4,7 @@ import Timeline from '@/components/Timeline';
 import DocumentViewer from '@/components/DocumentViewer';
 import Dashboard from '@/components/Dashboard';
 import AdminPanel from '@/components/AdminPanel';
+import UserPanel from '@/components/UserPanel';
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <Map />
       <Sidebar />
       <Dashboard />
+      <UserPanel />
       <Timeline />
       <DocumentViewer />
       <AdminPanel />

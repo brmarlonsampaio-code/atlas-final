@@ -24,7 +24,11 @@ export class SearchService {
           },
         },
       });
-      return hits.hits.map((item) => item._source);
+      
+      const internalHits = hits.hits.map((item) => item._source);
+      const federatedHits = await this.fetchFromEuropeanaMock(query);
+      
+      return [...internalHits, ...federatedHits];
     } catch (e) {
       // Fallback para ambiente local sem ElasticSearch rodando
       return [
@@ -35,5 +39,19 @@ export class SearchService {
         }
       ];
     }
+  }
+
+  // Federated Search (Agregação Externa)
+  private async fetchFromEuropeanaMock(query: string) {
+    if (query.length < 3) return [];
+    
+    // Simula uma chamada RESTful para API da Europeana ou Wikidata
+    return [
+      {
+        nome: `[Europeana API] Acervo externo correspondente a: ${query}`,
+        tipo: 'Documento Digitalizado',
+        _obs: 'Este resultado foi agregado automaticamente de instituições globais parceiras.'
+      }
+    ];
   }
 }

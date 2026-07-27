@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import DeckGL from '@deck.gl/react';
-import { GeoJsonLayer, ArcLayer } from '@deck.gl/layers';
+import { GeoJsonLayer, ArcLayer, BitmapLayer } from '@deck.gl/layers';
 import { Map as MapLibre } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -19,7 +19,14 @@ const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.j
 export default function Map() {
   const [hoverInfo, setHoverInfo] = useState<any>(null);
 
-  const layers = [
+  const layers = useMemo(() => [
+    new BitmapLayer({
+      id: 'historical-raster-layer',
+      bounds: [-60, -35, -30, 5],
+      image: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/1550_map_of_South_America_by_Pierre_Desceliers.jpg',
+      opacity: 0.35,
+      pickable: false,
+    }),
     new GeoJsonLayer({
       id: 'portos-layer',
       data: '/data/portos.json',
