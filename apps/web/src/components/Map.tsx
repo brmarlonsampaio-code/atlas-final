@@ -41,7 +41,7 @@ export default function Map() {
       getPointRadius: 100,
       pointRadiusMinPixels: 6,
       pointRadiusMaxPixels: 20,
-      onHover: (info) => setHoverInfo(info)
+      onHover: (info: any) => setHoverInfo(info)
     }),
     new ArcLayer({
       id: 'rotas-layer',
@@ -52,9 +52,9 @@ export default function Map() {
       getSourceColor: [239, 68, 68, 200], // Tailwind red-500
       getTargetColor: [59, 130, 246, 200], // Tailwind blue-500
       getWidth: (d: any) => Math.max(1.5, d.volume / 8000), // Scale width by volume
-      onHover: (info) => setHoverInfo(info)
+      onHover: (info: any) => setHoverInfo(info)
     })
-  ];
+  ], []);
 
   return (
     <div className="absolute inset-0 w-full h-full">

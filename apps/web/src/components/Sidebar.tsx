@@ -48,7 +48,7 @@ export default function Sidebar() {
 function NavItem({ icon, label, active = false }: { icon: React.ReactNode, label: string, active?: boolean }) {
   return (
     <button className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg transition-colors text-sm ${active ? 'bg-white/10 text-white' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'}`}>
-      {React.cloneElement(icon as React.ReactElement, { className: 'w-4 h-4' })}
+      {React.cloneElement(icon as React.ReactElement, { className: 'w-4 h-4' } as any)}
       <span>{label}</span>
     </button>
   );
