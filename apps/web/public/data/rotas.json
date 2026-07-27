@@ -1,0 +1,37 @@
+[
+  {
+    "origem": "Fortaleza de São Jorge da Mina",
+    "destino": "Porto de Salvador",
+    "from": [-0.19, 5.55],
+    "to": [-38.51, -12.97],
+    "volume": 12000
+  },
+  {
+    "origem": "Lisboa",
+    "destino": "Porto do Recife",
+    "from": [-9.13, 38.72],
+    "to": [-34.87, -8.05],
+    "volume": 8000
+  },
+  {
+    "origem": "Lisboa",
+    "destino": "Cais do Valongo (Rio de Janeiro)",
+    "from": [-9.13, 38.72],
+    "to": [-43.20, -22.90],
+    "volume": 15000
+  },
+  {
+    "origem": "Angola (Luanda)",
+    "destino": "Cais do Valongo (Rio de Janeiro)",
+    "from": [13.23, -8.83],
+    "to": [-43.20, -22.90],
+    "volume": 35000
+  },
+  {
+    "origem": "Porto do Recife",
+    "destino": "Amsterdã",
+    "from": [-34.87, -8.05],
+    "to": [4.90, 52.36],
+    "volume": 5000
+  }
+]

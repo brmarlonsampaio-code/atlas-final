@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-38.51, -12.97] },
+      "properties": { "nome": "Porto de Salvador", "tipo": "Porto", "periodo": "Séc XVI - XIX" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-43.20, -22.90] },
+      "properties": { "nome": "Cais do Valongo (Rio de Janeiro)", "tipo": "Porto", "periodo": "Séc XVIII - XIX" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-34.87, -8.05] },
+      "properties": { "nome": "Porto do Recife", "tipo": "Porto", "periodo": "Séc XVI - XIX" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-9.13, 38.72] },
+      "properties": { "nome": "Lisboa", "tipo": "Porto de Partida", "periodo": "Séc XV - XIX" }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-0.19, 5.55] },
+      "properties": { "nome": "Fortaleza de São Jorge da Mina", "tipo": "Feitoria", "periodo": "1482 - XIX" }
+    }
+  ]
+}
