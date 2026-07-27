@@ -8,10 +8,16 @@ import { Lugar } from './lugar.entity';
 export class LugarController {
   constructor(private readonly lugarService: LugarService) {}
 
-  @Get('mock')
-  @ApiOperation({ summary: 'Retorna um GeoJSON mockado para testes do frontend' })
-  getMock() {
-    return this.lugarService.getMockData();
+  @Get('mock/portos')
+  @ApiOperation({ summary: 'Retorna GeoJSON de portos simulados' })
+  getMockPortos() {
+    return this.lugarService.getMockPortos();
+  }
+
+  @Get('mock/rotas')
+  @ApiOperation({ summary: 'Retorna array JSON de rotas simuladas' })
+  getMockRotas() {
+    return this.lugarService.getMockRotas();
   }
 
   @Get()

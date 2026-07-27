@@ -29,7 +29,7 @@ export default function Map() {
     }),
     new GeoJsonLayer({
       id: 'portos-layer',
-      data: '/data/portos.json',
+      data: 'http://localhost:3001/lugares/mock/portos',
       pickable: true,
       stroked: false,
       filled: true,
@@ -45,7 +45,7 @@ export default function Map() {
     }),
     new ArcLayer({
       id: 'rotas-layer',
-      data: '/data/rotas.json',
+      data: 'http://localhost:3001/lugares/mock/rotas',
       pickable: true,
       getSourcePosition: (d: any) => d.from,
       getTargetPosition: (d: any) => d.to,
