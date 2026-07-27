@@ -4,6 +4,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LugarModule } from './lugar/lugar.module';
 import { SearchModule } from './search/search.module';
+import { AiModule } from './ai/ai.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { SearchModule } from './search/search.module';
     }),
     LugarModule,
     SearchModule,
+    AiModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
