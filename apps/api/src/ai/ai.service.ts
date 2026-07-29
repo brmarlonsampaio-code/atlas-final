@@ -17,7 +17,7 @@ export class AiService {
       const { data: { text } } = await Tesseract.recognize(
         imageUrl,
         'por', // Português
-        { logger: m => this.logger.debug(`Status OCR: ${m.status}`) }
+        { logger: (m: any) => this.logger.debug(`Status OCR: ${m.status}`) }
       );
 
       // 2. Extração de Entidades Nomeadas (Mock de IA Generativa)

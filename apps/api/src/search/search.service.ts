@@ -25,7 +25,7 @@ export class SearchService {
         },
       });
       
-      const internalHits = hits.hits.map((item) => item._source);
+      const internalHits = hits.hits.map((item: any) => item._source);
       const federatedHits = await this.fetchFromEuropeanaMock(query);
       
       return [...internalHits, ...federatedHits];
