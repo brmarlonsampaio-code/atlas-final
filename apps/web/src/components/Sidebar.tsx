@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Layers, Search, Clock, Compass, Eye, EyeOff } from 'lucide-react';
+import { Search, Clock, Compass } from 'lucide-react';
 import { useMapContext } from '../context/MapContext';
 
 export default function Sidebar() {
