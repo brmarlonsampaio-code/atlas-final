@@ -1,46 +1,53 @@
 'use client';
 
 import React, { createContext, useContext, useState } from 'react';
-
-type LayerId = 'portos-layer' | 'rotas-layer' | 'historical-raster-layer';
+import { SYMBOLOGY } from '../lib/symbology';
 
 interface MapContextProps {
-  visibleLayers: Record<LayerId, boolean>;
-  toggleLayer: (id: LayerId) => void;
+  activeCategories: Set<string>;
+  toggleCategory: (id: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  selectedLocation: any | null;
+  setSelectedLocation: (location: any | null) => void;
+  entityStats: Record<string, number>;
+  setEntityStats: (stats: Record<string, number>) => void;
 }
 
 const defaultContext: MapContextProps = {
-  visibleLayers: {
-    'portos-layer': true,
-    'rotas-layer': true,
-    'historical-raster-layer': true,
-  },
-  toggleLayer: () => {},
+  activeCategories: new Set(Object.keys(SYMBOLOGY)),
+  toggleCategory: () => {},
   searchQuery: '',
   setSearchQuery: () => {},
+  selectedLocation: null,
+  setSelectedLocation: () => {},
+  entityStats: {},
+  setEntityStats: () => {},
 };
 
 const MapContext = createContext<MapContextProps>(defaultContext);
 
 export function MapProvider({ children }: { children: React.ReactNode }) {
-  const [visibleLayers, setVisibleLayers] = useState<Record<LayerId, boolean>>({
-    'portos-layer': true,
-    'rotas-layer': true,
-    'historical-raster-layer': true,
-  });
+  // Por padrão, todas as categorias começam ativadas
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set(Object.keys(SYMBOLOGY)));
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+  const [entityStats, setEntityStats] = useState<Record<string, number>>({});
 
-  const toggleLayer = (id: LayerId) => {
-    setVisibleLayers((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const toggleCategory = (id: string) => {
+    setActiveCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   return (
-    <MapContext.Provider value={{ visibleLayers, toggleLayer, searchQuery, setSearchQuery }}>
+    <MapContext.Provider value={{ activeCategories, toggleCategory, searchQuery, setSearchQuery, selectedLocation, setSelectedLocation, entityStats, setEntityStats }}>
       {children}
     </MapContext.Provider>
   );
