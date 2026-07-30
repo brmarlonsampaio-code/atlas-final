@@ -6,7 +6,7 @@ import { Layers, Search, Clock, Compass, Eye, EyeOff } from 'lucide-react';
 import { useMapContext } from '../context/MapContext';
 
 export default function Sidebar() {
-  const { visibleLayers, toggleLayer, searchQuery, setSearchQuery } = useMapContext();
+  const { searchQuery, setSearchQuery } = useMapContext();
 
   return (
     <motion.aside
@@ -34,29 +34,6 @@ export default function Sidebar() {
           />
         </div>
 
-        <div className="flex flex-col gap-4">
-          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-            <Layers className="w-3 h-3" /> Camadas Ativas
-          </h2>
-          <div className="flex flex-col gap-2">
-            <LayerToggle 
-              label="Mapa Histórico (1550)" 
-              active={visibleLayers['historical-raster-layer']} 
-              onClick={() => toggleLayer('historical-raster-layer')} 
-            />
-            <LayerToggle 
-              label="Portos e Feitorias" 
-              active={visibleLayers['portos-layer']} 
-              onClick={() => toggleLayer('portos-layer')} 
-            />
-            <LayerToggle 
-              label="Rotas Atlânticas" 
-              active={visibleLayers['rotas-layer']} 
-              onClick={() => toggleLayer('rotas-layer')} 
-            />
-          </div>
-        </div>
-
         <nav className="flex flex-col gap-2 mt-4">
           <NavItem icon={<Compass />} label="Explorar Mapa" active />
           <NavItem icon={<Clock />} label="Linha do Tempo" />
@@ -69,18 +46,6 @@ export default function Sidebar() {
         </div>
       </div>
     </motion.aside>
-  );
-}
-
-function LayerToggle({ label, active, onClick }: { label: string, active: boolean, onClick: () => void }) {
-  return (
-    <button 
-      onClick={onClick}
-      className={`flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors text-sm ${active ? 'bg-blue-500/10 text-blue-300 border border-blue-500/20' : 'bg-white/5 text-zinc-400 border border-transparent hover:bg-white/10 hover:text-zinc-200'}`}
-    >
-      <span>{label}</span>
-      {active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-    </button>
   );
 }
 
