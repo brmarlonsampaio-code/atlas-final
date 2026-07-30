@@ -2,11 +2,34 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import DeckGL from '@deck.gl/react';
-import { _GlobeView as GlobeView } from '@deck.gl/core';
 import { GeoJsonLayer, ArcLayer, BitmapLayer } from '@deck.gl/layers';
+import { Map as MapLibre } from 'react-map-gl/maplibre';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapContext } from '../context/MapContext';
 
-const INITIAL_VIEW_STATE = { longitude: -30.0, latitude: 15.0, zoom: 2, pitch: 15, bearing: 0 };
+const INITIAL_VIEW_STATE = { longitude: -30.0, latitude: 15.0, zoom: 3, pitch: 45, bearing: 0 };
+
+// Estilo de satélite premium da ESRI (High Quality 2D Satellite)
+const ESRI_SATELLITE_STYLE = {
+  version: 8,
+  sources: {
+    esri: {
+      type: 'raster',
+      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+      tileSize: 256,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    }
+  },
+  layers: [
+    {
+      id: 'esri-satellite',
+      type: 'raster',
+      source: 'esri',
+      minzoom: 0,
+      maxzoom: 19
+    }
+  ]
+};
 
 export default function Map() {
   const [hoverInfo, setHoverInfo] = useState<any>(null);
@@ -34,21 +57,13 @@ export default function Map() {
 
   const layers = useMemo(() => {
     const active = [];
-    
-    // Camada Base da Terra (Substitui o MapLibre) - NASA Blue Marble
-    active.push(new BitmapLayer({
-      id: 'earth-base-layer',
-      bounds: [-180, -90, 180, 90],
-      image: 'https://raw.githubusercontent.com/visgl/deck.gl-data/master/images/earth-blue-marble.jpg',
-      pickable: false,
-    }));
 
     if (visibleLayers['historical-raster-layer']) {
       active.push(new BitmapLayer({
         id: 'historical-raster-layer',
         bounds: [-60, -35, -30, 5],
         image: 'https://upload.wikimedia.org/wikipedia/commons/4/4e/1550_map_of_South_America_by_Pierre_Desceliers.jpg',
-        opacity: 0.7,
+        opacity: 0.6,
         pickable: false,
       }));
     }
@@ -65,7 +80,7 @@ export default function Map() {
         extruded: false,
         pointType: 'circle',
         getFillColor: [66, 135, 245, 255],
-        getPointRadius: 200000, // Tamanho adaptado para o globo em metros
+        getPointRadius: 100, // Tamanho revertido para a escala 2D
         pointRadiusMinPixels: 4,
         pointRadiusMaxPixels: 20,
         onHover: (info: any) => setHoverInfo(info)
@@ -81,7 +96,7 @@ export default function Map() {
         getTargetPosition: (d: any) => d.to,
         getSourceColor: [239, 68, 68, 255],
         getTargetColor: [59, 130, 246, 255],
-        getWidth: (d: any) => Math.max(2, d.volume / 4000),
+        getWidth: (d: any) => Math.max(1.5, d.volume / 8000), // Largura revertida para a escala 2D
         onHover: (info: any) => setHoverInfo(info)
       }));
     }
@@ -90,13 +105,16 @@ export default function Map() {
   }, [visibleLayers, filteredPortos, rotasData]);
 
   return (
-    <div className="absolute inset-0 w-full h-full bg-[#030508] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#0a121c] via-[#030508] to-black">
+    <div className="absolute inset-0 w-full h-full bg-black">
       <DeckGL 
-        views={new GlobeView()}
         initialViewState={INITIAL_VIEW_STATE} 
         controller={true} 
         layers={layers}
       >
+        <MapLibre 
+          mapStyle={ESRI_SATELLITE_STYLE as any} 
+          attributionControl={false} 
+        />
         {hoverInfo && hoverInfo.object && (
           <div style={{
             position: 'absolute', zIndex: 1, pointerEvents: 'none', left: hoverInfo.x, top: hoverInfo.y,
