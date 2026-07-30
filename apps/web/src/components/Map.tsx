@@ -5,25 +5,7 @@ import MapLibre, { Source, Layer, MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useMapContext } from '../context/MapContext';
 
-const ESRI_SATELLITE_STYLE = {
-  version: 8,
-  sources: {
-    esri: {
-      type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-      tileSize: 256
-    }
-  },
-  layers: [
-    {
-      id: 'esri-satellite',
-      type: 'raster',
-      source: 'esri',
-      minzoom: 0,
-      maxzoom: 19
-    }
-  ]
-};
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 export default function Map() {
   const { activeCategories, searchQuery, setSelectedLocation, setEntityStats } = useMapContext();
@@ -95,7 +77,7 @@ export default function Map() {
     <div className="absolute inset-0 w-full h-full bg-black">
       <MapLibre
         initialViewState={{ longitude: -30, latitude: 15, zoom: 3, pitch: 45 }}
-        mapStyle={ESRI_SATELLITE_STYLE as any}
+        mapStyle={MAP_STYLE}
         interactiveLayerIds={['unclustered-point']}
         onClick={(e) => {
           if (e.features && e.features.length > 0) {
