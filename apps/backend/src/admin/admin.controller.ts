@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,10 +13,18 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AdminAuthGuard } from './admin-auth.guard';
 import { AdminService } from './admin.service';
 import type { CreateEntityInput } from './admin.service';
 
+const ALLOWED_DOCUMENT_TYPES = /\.(pdf|jpg|jpeg|png|webp|gif)$/i;
+const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_GEOJSON_SIZE = 10 * 1024 * 1024; // 10MB
+
+// Limite bem mais apertado que o resto da API pública: dificulta
+// tentar adivinhar ADMIN_API_KEY por força bruta.
+@Throttle({ default: { limit: 20, ttl: 60_000 } })
 @ApiTags('backoffice')
 @ApiBearerAuth()
 @UseGuards(AdminAuthGuard)
@@ -59,7 +68,17 @@ export class AdminController {
       },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: MAX_DOCUMENT_SIZE },
+      fileFilter: (_req, file, cb) => {
+        if (!ALLOWED_DOCUMENT_TYPES.test(file.originalname)) {
+          return cb(new BadRequestException('Tipo de arquivo não permitido. Use PDF ou imagem (jpg, png, webp, gif).'), false);
+        }
+        cb(null, true);
+      },
+    }),
+  )
   attachDocument(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
@@ -77,7 +96,7 @@ export class AdminController {
       properties: { file: { type: 'string', format: 'binary' } },
     },
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: MAX_GEOJSON_SIZE } }))
   uploadGeoJSON(@UploadedFile() file: Express.Multer.File) {
     return this.adminService.importGeoJSON(file);
   }
