@@ -12,6 +12,8 @@ interface MapContextProps {
   setSelectedLocation: (location: any | null) => void;
   entityStats: Record<string, number>;
   setEntityStats: (stats: Record<string, number>) => void;
+  selectedDocument: any | null;
+  setSelectedDocument: (doc: any | null) => void;
 }
 
 const defaultContext: MapContextProps = {
@@ -23,6 +25,8 @@ const defaultContext: MapContextProps = {
   setSelectedLocation: () => {},
   entityStats: {},
   setEntityStats: () => {},
+  selectedDocument: null,
+  setSelectedDocument: () => {},
 };
 
 const MapContext = createContext<MapContextProps>(defaultContext);
@@ -33,6 +37,7 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
   const [entityStats, setEntityStats] = useState<Record<string, number>>({});
+  const [selectedDocument, setSelectedDocument] = useState<any | null>(null);
 
   const toggleCategory = (id: string) => {
     setActiveCategories((prev) => {
@@ -47,7 +52,7 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <MapContext.Provider value={{ activeCategories, toggleCategory, searchQuery, setSearchQuery, selectedLocation, setSelectedLocation, entityStats, setEntityStats }}>
+    <MapContext.Provider value={{ activeCategories, toggleCategory, searchQuery, setSearchQuery, selectedLocation, setSelectedLocation, entityStats, setEntityStats, selectedDocument, setSelectedDocument }}>
       {children}
     </MapContext.Provider>
   );

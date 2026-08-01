@@ -1,109 +1,98 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, ZoomIn, X, ChevronRight, Languages, Quote, Check } from 'lucide-react';
+import { FileText, X, ExternalLink, Quote, Check } from 'lucide-react';
+import { useMapContext } from '../context/MapContext';
 
 export default function DocumentViewer() {
-  const [isOpen, setIsOpen] = useState(true);
+  const { selectedDocument, setSelectedDocument, selectedLocation } = useMapContext();
   const [copiedQuote, setCopiedQuote] = useState(false);
 
+  // Fecha automaticamente a citação copiada ao trocar de documento
+  useEffect(() => setCopiedQuote(false), [selectedDocument]);
+
+  if (!selectedDocument) return null;
+
+  const { title, type, url } = selectedDocument;
+  const isPdf = url?.toLowerCase().endsWith('.pdf');
+  const isImage = /\.(png|jpe?g|webp|gif)$/i.test(url || '');
+  const localName = selectedLocation?.properties?.title || selectedLocation?.properties?.nome || 'Atlas Histórico Digital do Atlântico e das Diásporas';
+
   const generateCitation = () => {
-    // Simulador de gerador dinâmico de ABNT
-    const citation = "ARQUIVO NACIONAL. Carta de Alforria de João. Códice 123. Rio de Janeiro, 1792. Disponível no Atlas Histórico Digital do Atlântico e das Diásporas.";
+    const year = new Date().getFullYear();
+    const citation = `${title}. In: Atlas Histórico Digital do Atlântico e das Diásporas — ${localName}. Acesso em ${year}.`;
     navigator.clipboard.writeText(citation);
     setCopiedQuote(true);
     setTimeout(() => setCopiedQuote(false), 2000);
   };
 
   return (
-    <>
-      {/* Toggle Button if closed */}
-      {!isOpen && (
-        <button 
-          onClick={() => setIsOpen(true)}
-          className="absolute top-6 right-6 z-20 bg-black/40 backdrop-blur-xl border border-white/10 p-3 rounded-full text-white hover:bg-white/10 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-        >
-          <FileText className="w-5 h-5" />
-        </button>
-      )}
+    <AnimatePresence>
+      <motion.aside
+        key={url}
+        initial={{ x: 400, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: 400, opacity: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute top-0 right-0 w-full md:w-[420px] h-full z-30 p-0 md:p-6 flex flex-col pointer-events-none"
+      >
+        <div className="flex-1 bg-black/85 backdrop-blur-3xl md:border border-white/10 md:rounded-2xl p-6 shadow-2xl flex flex-col gap-4 overflow-hidden pointer-events-auto">
 
-      {/* Slide-out Panel */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.aside
-            initial={{ x: 400, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 400, opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-0 right-0 w-96 h-full z-10 p-6 flex flex-col justify-between"
-          >
-            <div className="flex-1 bg-black/50 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 overflow-hidden pointer-events-auto">
-              
-              {/* Header */}
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-xl font-bold tracking-tight text-white font-serif">
-                    Carta de Alforria
-                  </h2>
-                  <p className="text-xs text-zinc-400 mt-1">Rio de Janeiro, 1792</p>
-                </div>
-                <button 
-                  onClick={() => setIsOpen(false)}
-                  className="text-zinc-400 hover:text-white transition-colors"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Document Image Area (Mock IIIF Viewer) */}
-              <div className="relative flex-1 bg-black/80 rounded-lg border border-white/5 overflow-hidden group">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img 
-                  src="/manuscript.jpg" 
-                  alt="Manuscrito Histórico" 
-                  className="object-cover w-full h-full opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 cursor-zoom-in"
-                />
-                
-                {/* Floating Tools over Document */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/80 backdrop-blur-md rounded-full px-4 py-2 border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="text-white hover:text-blue-400 transition-colors"><ZoomIn className="w-4 h-4" /></button>
-                  <button className="text-white hover:text-blue-400 transition-colors"><Languages className="w-4 h-4" /></button>
-                </div>
-              </div>
-
-              {/* Metadata & OCR Tabs */}
-              <div className="h-48 bg-white/5 rounded-lg border border-white/5 p-4 flex flex-col gap-3 overflow-y-auto hide-scrollbar">
-                <div className="flex gap-4 border-b border-white/10 pb-2">
-                  <button className="text-xs font-bold text-white border-b-2 border-blue-500 pb-1">Metadados</button>
-                  <button className="text-xs font-medium text-zinc-500 hover:text-zinc-300">Transcrição (IA)</button>
-                </div>
-                
-                <div className="text-xs text-zinc-300 space-y-2">
-                  <p><span className="font-bold text-zinc-400">Fundo:</span> Arquivo Nacional</p>
-                  <p><span className="font-bold text-zinc-400">Coleção:</span> Códice 123</p>
-                  <p><span className="font-bold text-zinc-400">Idioma:</span> Português Arcaico</p>
-                  
-                  {/* Botão Geração Automática de Citação */}
-                  <div className="pt-2">
-                    <button 
-                      onClick={generateCitation}
-                      className="flex items-center gap-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-1.5 rounded-md text-white transition-colors w-full justify-center"
-                    >
-                      {copiedQuote ? <Check className="w-3 h-3 text-green-400" /> : <Quote className="w-3 h-3" />}
-                      {copiedQuote ? 'Citação Copiada (ABNT)' : 'Gerar Citação (ABNT/APA)'}
-                    </button>
-                  </div>
-
-                  <p className="pt-2 border-t border-white/5 leading-relaxed text-zinc-400 italic">
-                    &quot;Declaro que concedo a liberdade a meu escravo João, por bons serviços prestados...&quot;
-                  </p>
-                </div>
-              </div>
+          {/* Header */}
+          <div className="flex justify-between items-start gap-4">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold tracking-tight text-white font-serif truncate">
+                {title}
+              </h2>
+              {type && <p className="text-xs text-zinc-400 mt-1 uppercase tracking-wide">{type}</p>}
             </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-    </>
+            <button
+              onClick={() => setSelectedDocument(null)}
+              className="text-zinc-400 hover:text-white transition-colors shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Área de visualização do documento */}
+          <div className="relative flex-1 bg-black/80 rounded-lg border border-white/5 overflow-hidden">
+            {isPdf && (
+              <iframe src={url} title={title} className="w-full h-full" />
+            )}
+            {!isPdf && isImage && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={url} alt={title} className="object-contain w-full h-full" />
+            )}
+            {!isPdf && !isImage && (
+              <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-6 text-center">
+                <FileText className="w-10 h-10 text-zinc-600" />
+                <p className="text-sm text-zinc-400">Pré-visualização não disponível para este tipo de arquivo.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Ações */}
+          <div className="flex flex-col gap-2">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-2 rounded-md text-white transition-colors w-full justify-center"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Abrir em nova aba
+            </a>
+            <button
+              onClick={generateCitation}
+              className="flex items-center gap-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 px-3 py-2 rounded-md text-white transition-colors w-full justify-center"
+            >
+              {copiedQuote ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Quote className="w-3.5 h-3.5" />}
+              {copiedQuote ? 'Citação copiada' : 'Copiar citação'}
+            </button>
+          </div>
+        </div>
+      </motion.aside>
+    </AnimatePresence>
   );
 }
