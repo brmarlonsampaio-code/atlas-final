@@ -1,49 +1,84 @@
-import { Controller, Post, UseInterceptors, UploadedFile, Logger } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AdminAuthGuard } from './admin-auth.guard';
+import { AdminService } from './admin.service';
+import type { CreateEntityInput } from './admin.service';
 
 @ApiTags('backoffice')
+@ApiBearerAuth()
+@UseGuards(AdminAuthGuard)
 @Controller('admin')
 export class AdminController {
-  private readonly logger = new Logger(AdminController.name);
+  constructor(private readonly adminService: AdminService) {}
 
-  @Post('upload-geojson')
-  @ApiOperation({ summary: 'Faz o upload e ingestão de um dataset GeoJSON (Mapas/Rotas)' })
+  @Get('entities')
+  @ApiOperation({ summary: 'Lista todas as entidades cadastradas (visão administrativa)' })
+  listEntities() {
+    return this.adminService.listEntities();
+  }
+
+  @Post('entities')
+  @ApiOperation({ summary: 'Cria uma nova entidade (documento/local) no banco' })
+  createEntity(@Body() body: CreateEntityInput) {
+    return this.adminService.createEntity(body);
+  }
+
+  @Put('entities/:id')
+  @ApiOperation({ summary: 'Edita uma entidade existente' })
+  updateEntity(@Param('id') id: string, @Body() body: Partial<CreateEntityInput>) {
+    return this.adminService.updateEntity(id, body);
+  }
+
+  @Delete('entities/:id')
+  @ApiOperation({ summary: 'Remove uma entidade e seus vínculos' })
+  deleteEntity(@Param('id') id: string) {
+    return this.adminService.deleteEntity(id);
+  }
+
+  @Post('entities/:id/documents')
+  @ApiOperation({ summary: 'Anexa um documento (PDF/imagem) a uma entidade' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
+        file: { type: 'string', format: 'binary' },
+        title: { type: 'string' },
       },
     },
   })
   @UseInterceptors(FileInterceptor('file'))
+  attachDocument(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body('title') title?: string,
+  ) {
+    return this.adminService.attachDocument(id, file, title);
+  }
+
+  @Post('upload-geojson')
+  @ApiOperation({ summary: 'Importa em massa um FeatureCollection GeoJSON de pontos' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { file: { type: 'string', format: 'binary' } },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
   uploadGeoJSON(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      return { success: false, message: 'Nenhum arquivo enviado.' };
-    }
-
-    this.logger.log(`Recebido arquivo GeoJSON: ${file.originalname} (${file.size} bytes)`);
-
-    try {
-      // O conteúdo binário do arquivo seria convertido em JSON
-      const content = file.buffer.toString('utf8');
-      const geojson = JSON.parse(content);
-
-      // Aqui ocorreria a chamada ao serviço PostGIS para importar maciçamente a geometria.
-      
-      return {
-        success: true,
-        message: 'Dataset espacial importado com sucesso para o PostGIS.',
-        featuresCount: geojson.features?.length || 0,
-      };
-    } catch (e) {
-      this.logger.error('Erro ao processar GeoJSON', e);
-      return { success: false, message: 'Arquivo JSON/GeoJSON inválido.' };
-    }
+    return this.adminService.importGeoJSON(file);
   }
 }

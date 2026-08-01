@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './db/db.module';
 import { EntitiesModule } from './entities/entities.module';
 import { RoutesModule } from './routes/routes.module';
+import { CategoriesModule } from './categories/categories.module';
 import { AiModule } from './ai/ai.module';
 import { AdminModule } from './admin/admin.module';
 
@@ -15,6 +16,7 @@ import { AdminModule } from './admin/admin.module';
     DbModule,
     EntitiesModule,
     RoutesModule,
+    CategoriesModule,
     SearchModule,
     AiModule,
     AdminModule,
