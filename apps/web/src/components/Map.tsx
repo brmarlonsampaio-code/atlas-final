@@ -47,10 +47,11 @@ export default function Map() {
   const [isHovering, setIsHovering] = useState(false);
   const mapRef = useRef<MapRef>(null);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
   useEffect(() => {
-    // Dados dos pontos (portos, fortificações, quilombos etc.)
-    // Em produção, substituir por: fetch(`${process.env.NEXT_PUBLIC_API_URL}/entities`)
-    fetch('/api/mock/portos')
+    // Dados dos pontos (portos, fortificações, quilombos etc.) — backend real (NestJS + PostGIS)
+    fetch(`${apiUrl}/entities`)
       .then((res) => res.json())
       .then((json) => {
         // Enriquece cada feature com cor/ícone vindos da simbologia local
@@ -79,8 +80,8 @@ export default function Map() {
       })
       .catch((err) => console.error('Erro ao buscar entidades:', err));
 
-    // Dados das rotas atlânticas (tráfico e comércio)
-    fetch('/api/mock/rotas')
+    // Dados das rotas atlânticas (tráfico e comércio) — backend real
+    fetch(`${apiUrl}/routes`)
       .then((res) => res.json())
       .then((json) => {
         const enriched = {
@@ -96,7 +97,7 @@ export default function Map() {
         setRoutes(enriched);
       })
       .catch((err) => console.error('Erro ao buscar rotas:', err));
-  }, [setEntityStats]);
+  }, [apiUrl, setEntityStats]);
 
   const filteredData = useMemo(() => {
     if (!data || !data.features) return null;

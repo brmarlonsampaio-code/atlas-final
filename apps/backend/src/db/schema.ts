@@ -11,11 +11,22 @@ export const categories = pgTable('categories', {
 
 export const entities = pgTable('entities', {
   id: varchar('id').primaryKey(),
-  title: text('title').notNull(),
+  title: text('title').notNull(), // Título
   subtitle: text('subtitle'),
+  summary: text('summary'), // Resumo
   description: text('description'),
-  period: varchar('period'),
-  year: varchar('year'),
+  author: varchar('author'), // Autor
+  century: varchar('century'), // Século
+  period: varchar('period'), // Período
+  year: varchar('year'), // Data
+  documentType: varchar('document_type'), // Tipo documental
+  theme: varchar('theme'), // Tema
+  space: varchar('space'), // Espaço
+  process: varchar('process'), // Processo
+  object: varchar('object'), // Objeto
+  experience: text('experience'), // Experiência
+  knowledges: text('knowledges'), // Saberes
+  practices: text('practices'), // Fazeres
   country: varchar('country'),
   region: varchar('region'),
   culture: varchar('culture'),
@@ -26,6 +37,10 @@ export const entities = pgTable('entities', {
   coverImage: text('cover_image'),
   gallery: jsonb('gallery'),
   videos: jsonb('videos'),
+  sourceArchive: text('source_archive'), // Arquivo de origem
+  sourceUrl: text('source_url'), // Link da fonte
+  bibliography: text('bibliography'), // Bibliografia
+  notes: text('notes'), // Observações
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
@@ -76,4 +91,17 @@ export const entityRelations = pgTable('entity_relations', {
   sourceId: varchar('source_id').references(() => entities.id),
   targetId: varchar('target_id').references(() => entities.id),
   relationType: varchar('relation_type'),
+});
+
+// Rotas atlânticas (tráfico, comércio) conectando duas entidades já cadastradas.
+// A geometria (LineString) é derivada das coordenadas das entidades de origem/destino.
+export const routes = pgTable('routes', {
+  id: varchar('id').primaryKey(),
+  sourceEntityId: varchar('source_entity_id').references(() => entities.id).notNull(),
+  targetEntityId: varchar('target_entity_id').references(() => entities.id).notNull(),
+  category: varchar('category'), // ex: 'trafico', 'comercio'
+  intensity: real('intensity'), // 1-5, uso visual (espessura da linha), não é contagem exata
+  note: text('note'),
+  geom: geometry('geom', { type: 'LineString', srid: 4326 }).notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
 });
